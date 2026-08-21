@@ -32,6 +32,11 @@ Estructura:
 
 Sé específico con archivos y líneas. No repitas el diff. Si no hay problemas, dilo.
 
+Reglas anti falsos positivos:
+- Solo reporta problemas reales del código del diff. No inventes.
+- Verifica la API real de las librerías usadas antes de sugerir cambios.
+- No sugieras cambiar algo que ya es correcto. Si dudas, omítelo.
+
 Devuelve solo la revisión en Markdown, sin introducción ni despedida.
 
 --- BEGIN GIT DIFF ---
