@@ -93,5 +93,5 @@ docker run --rm -v "$PWD:/src" semgrep/semgrep semgrep scan --config=auto --erro
 ## Requisitos del runner self-hosted
 
 - Etiquetas del runner: `self-hosted`, `Linux`, `ARM64`.
-- Acceso a internet para que `actions/setup-python` descargue Python 3.12.
+- Python 3 y `venv` instalados en el runner (`sudo apt install python3 python3-venv python3-pip`).
 - Docker instalado y la imagen `semgrep/semgrep` ya descargada.
