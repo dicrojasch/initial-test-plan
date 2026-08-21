@@ -20,3 +20,8 @@ def test_calculate_discount_invalid():
 def test_get_user_by_id_and_format():
     row = get_user_by_id("1")
     assert format_user_data(row) == {"id": "1", "name": "Alice"}
+
+
+def test_calculate_discount_failing():
+    # Intentionally incorrect expectation: 20% off 100.0 is 80.0, not 85.0.
+    assert calculate_discount(100.0, 20.0) == 85.0

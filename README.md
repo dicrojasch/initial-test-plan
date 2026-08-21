@@ -9,6 +9,8 @@ Actions.
 ```
 .
 ├── .github/
+│   ├── scripts/
+│   │   └── ai_reviewer.py  # Agente de revisión de código con Gemini
 │   └── workflows/
 │       └── ci.yml          # Workflow de GitHub Actions (raíz del repositorio)
 ├── demo-ci-pipeline/
@@ -40,12 +42,14 @@ Actions.
 3. Abre un **Pull Request** hacia `main`. El workflow `CI` se ejecuta
    automáticamente porque está configurado con `on: pull_request` hacia `main`.
 
-El pipeline ejecuta dos jobs en runners self-hosted
+El pipeline ejecuta tres jobs en runners self-hosted
 (`runs-on: [self-hosted, Linux, ARM64]`):
 
 - **`lint-and-test`** — ejecuta `ruff check .` y `pytest` dentro de
   `demo-ci-pipeline/`.
 - **`semgrep-sast`** — ejecuta Semgrep vía Docker local con `--error`.
+- **`ai-review`** — revisa el diff del PR con Gemini y publica el comentario
+  automáticamente.
 
 ## Qué valida el pipeline
 
@@ -67,6 +71,35 @@ pipeline. Ya están corregidos:
   ```
 
 Con esto, ambos jobs del pipeline pasan.
+
+## Revisión de código con IA (Gemini)
+
+El job **`ai-review`** analiza los cambios del Pull Request con el modelo
+`gemini-2.5-flash` (SDK oficial `google-genai`) y publica la evaluación como
+comentario en el PR. Se ejecuta siempre (`if: always()`), sin importar si los
+jobs anteriores pasaron o fallaron.
+
+### Configurar el secreto de la API
+
+1. Obtén una API key en [Google AI Studio](https://aistudio.google.com/).
+2. En GitHub, ve a **Settings → Secrets and variables → Actions**.
+3. Pulsa **New repository secret** y crea:
+   - **`GEMINI_API_KEY`** — tu clave de Google AI Studio.
+   - **`GITHUB_TOKEN`** — GitHub lo provee automáticamente; no es necesario
+     crearlo, pero el workflow lo lee vía `${{ secrets.GITHUB_TOKEN }}`.
+
+> El job usa `permissions: pull-requests: write` para poder publicar el
+> comentario en el PR.
+
+### Cómo funciona
+
+En cada Pull Request:
+
+1. El job descarga el historial completo (`fetch-depth: 0`).
+2. Genera el diff con `git diff origin/main...HEAD > pr_diff.patch`.
+3. `ai_reviewer.py` envía el diff a Gemini con un prompt de *Senior Code
+   Reviewer* (diseño, mantenibilidad y mejoras accionables).
+4. Publica el resultado en el PR mediante la API REST de GitHub.
 
 ## Ejecutar localmente
 

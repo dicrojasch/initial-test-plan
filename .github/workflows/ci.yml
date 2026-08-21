@@ -45,3 +45,41 @@ jobs:
       - name: Run Semgrep via Local Docker
         run: |
           docker run --rm -v "${{ github.workspace }}:/src" semgrep/semgrep semgrep scan --config=auto --error
+
+  ai-review:
+    name: AI Code Review (Gemini)
+    runs-on: [self-hosted, Linux, ARM64]
+    needs: [lint-and-test, semgrep-sast]
+    if: always()
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5 (Node 24)
+        with:
+          fetch-depth: 0
+
+      - name: Generate PR diff
+        run: |
+          git fetch origin main --depth=1
+          git diff origin/main...HEAD > pr_diff.patch
+          wc -l pr_diff.patch
+
+      - name: Install dependencies
+        run: |
+          python3 -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install google-genai requests
+
+      - name: Run AI Code Review
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          DIFF_FILE: pr_diff.patch
+        run: |
+          . .venv/bin/activate
+          python .github/scripts/ai_reviewer.py

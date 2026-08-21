@@ -1,3 +1,6 @@
+import sys
+
+
 def calculate_discount(price: float, discount_percentage: float) -> float:
     """Return the discounted price for a given percentage discount."""
     if discount_percentage < 0 or discount_percentage > 100:
