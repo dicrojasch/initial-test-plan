@@ -7,7 +7,6 @@ and **Semgrep** running on self-hosted GitHub Actions runners.
 
 ```
 demo-ci-pipeline/
-├── .github/workflows/ci.yml
 ├── app/
 │   ├── __init__.py
 │   ├── database.py
@@ -37,33 +36,26 @@ The pipeline runs two jobs on self-hosted runners
 - **`lint-and-test`** — runs `ruff check .` and `pytest`.
 - **`semgrep-sast`** — runs Semgrep via Docker with `--error`.
 
-## Observing Failing Checks
+## What the Pipeline Validates
 
-This repository intentionally contains issues so the pipeline fails:
+- **Ruff** checks code quality (`ruff check .`) and fails on issues like unused
+  imports (`F401`).
+- **Pytest** runs the unit tests in `tests/`.
+- **Semgrep** (`semgrep scan --config=auto --error`) detects security
+  vulnerabilities such as SQL injection and fails on blocking findings.
 
-- **Ruff (lint)** fails because `app/services.py` has an unused import (`import sys`).
-- **Semgrep (security)** fails because `app/database.py` uses an f-string to build a
-  SQL query, which is a SQL injection vulnerability.
+This repository originally shipped with intentional flaws (an unused `import sys`
+and an f-string built SQL query) to demonstrate how the pipeline catches them.
+They have been fixed:
 
-To see the failures:
+- `app/services.py`: unused import removed.
+- `app/database.py`: the query now uses parameters:
 
-1. Open the Pull Request on GitHub.
-2. Look at the **Checks** section at the bottom of the PR.
-3. Click on each failed check (`lint-and-test` or `semgrep-sast`) to view the logs.
-4. Ruff will report `F401` (unused import); Semgrep will report a SQL injection
-   finding and exit with an error code.
+  ```python
+  cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+  ```
 
-## Fixing the Checks to Pass CI
-
-1. **Fix the unused import** in `app/services.py` by removing the line `import sys`.
-2. **Fix the SQL injection** in `app/database.py` by using a parameterized query
-   instead of string interpolation:
-
-   ```python
-   cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
-   ```
-
-3. Commit and push the fixes. The pipeline re-runs and should pass both jobs.
+Both pipeline jobs now pass.
 
 ## Running Locally
 
