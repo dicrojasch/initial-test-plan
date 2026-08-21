@@ -41,7 +41,7 @@ Actions.
    automáticamente porque está configurado con `on: pull_request` hacia `main`.
 
 El pipeline ejecuta dos jobs en runners self-hosted
-(`runs-on: [self-hosted, my-custom-runner]`):
+(`runs-on: [self-hosted, Linux, ARM64]`):
 
 - **`lint-and-test`** — ejecuta `ruff check .` y `pytest` dentro de
   `demo-ci-pipeline/`.
@@ -92,6 +92,6 @@ docker run --rm -v "$PWD:/src" semgrep/semgrep semgrep scan --config=auto --erro
 
 ## Requisitos del runner self-hosted
 
-- Etiqueta configurada: `my-custom-runner` (además de `self-hosted`).
+- Etiquetas del runner: `self-hosted`, `Linux`, `ARM64`.
 - Acceso a internet para que `actions/setup-python` descargue Python 3.12.
 - Docker instalado y la imagen `semgrep/semgrep` ya descargada.

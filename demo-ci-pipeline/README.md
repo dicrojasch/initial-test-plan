@@ -32,7 +32,7 @@ demo-ci-pipeline/
    automatically because it is configured with `on: pull_request` against `main`.
 
 The pipeline runs two jobs on self-hosted runners
-(`runs-on: [self-hosted, my-custom-runner]`):
+(`runs-on: [self-hosted, Linux, ARM64]`):
 
 - **`lint-and-test`** — runs `ruff check .` and `pytest`.
 - **`semgrep-sast`** — runs Semgrep via Docker with `--error`.

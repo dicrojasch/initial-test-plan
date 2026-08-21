@@ -8,7 +8,7 @@ on:
 jobs:
   lint-and-test:
     name: Code Quality & Unit Tests
-    runs-on: [self-hosted, my-custom-runner]
+    runs-on: [self-hosted, Linux, ARM64]
     defaults:
       run:
         working-directory: demo-ci-pipeline
@@ -35,7 +35,7 @@ jobs:
 
   semgrep-sast:
     name: Security Scan (Semgrep)
-    runs-on: [self-hosted, my-custom-runner]
+    runs-on: [self-hosted, Linux, ARM64]
 
     steps:
       - name: Check out code
