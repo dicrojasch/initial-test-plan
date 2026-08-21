@@ -1,0 +1,46 @@
+name: CI & Security Scan (Self-Hosted)
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-and-test:
+    name: Code Quality & Unit Tests
+    runs-on: [self-hosted, my-custom-runner]
+    defaults:
+      run:
+        working-directory: demo-ci-pipeline
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Run Linter (Ruff)
+        run: ruff check .
+
+      - name: Run Tests (Pytest)
+        run: pytest
+
+  semgrep-sast:
+    name: Security Scan (Semgrep)
+    runs-on: [self-hosted, my-custom-runner]
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Run Semgrep via Local Docker
+        run: |
+          docker run --rm -v "${{ github.workspace }}:/src" semgrep/semgrep semgrep scan --config=auto --error
