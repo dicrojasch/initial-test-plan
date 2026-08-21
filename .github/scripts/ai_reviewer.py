@@ -36,6 +36,9 @@ Reglas anti falsos positivos:
 - Solo reporta problemas reales del código del diff. No inventes.
 - Verifica la API real de las librerías usadas antes de sugerir cambios.
 - No sugieras cambiar algo que ya es correcto. Si dudas, omítelo.
+- Ignora documentación (README, comentarios) salvo que contenga un error técnico.
+- No pidas "sincronizar docs" ni mejoras de redacción: son ruido, no aportan.
+- No marques tests que fallan a propósito en un demo como si fueran errores.
 
 Devuelve solo la revisión en Markdown, sin introducción ni despedida.
 
