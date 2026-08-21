@@ -20,7 +20,7 @@ import requests
 from google import genai
 
 DIFF_FILE = os.environ.get("DIFF_FILE", "pr_diff.patch")
-MODEL = "gemini-2.5-flash"
+MODEL = "gemini-3.5-flash"
 
 REVIEWER_PROMPT = """Eres un revisor de código senior. Revisa el diff y responde en español,
 de forma breve y directa. Máximo 15 líneas.
